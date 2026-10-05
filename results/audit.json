@@ -1,0 +1,199 @@
+{
+  "rows": 24576,
+  "simulated_draws": 393216000,
+  "max_primary_metric_difference": 0.0,
+  "conditions": [
+    {
+      "scenario": "concentrated",
+      "budget": 6400,
+      "policy": "event_following",
+      "worlds": 1024,
+      "mean_regret": 0.05071289062499968,
+      "wrong_selections": 863
+    },
+    {
+      "scenario": "concentrated",
+      "budget": 6400,
+      "policy": "neyman",
+      "worlds": 1024,
+      "mean_regret": 0.044160156249999846,
+      "wrong_selections": 857
+    },
+    {
+      "scenario": "concentrated",
+      "budget": 6400,
+      "policy": "uniform",
+      "worlds": 1024,
+      "mean_regret": 0.05078124999999968,
+      "wrong_selections": 865
+    },
+    {
+      "scenario": "concentrated",
+      "budget": 6400,
+      "policy": "uniform_all",
+      "worlds": 1024,
+      "mean_regret": 0.05060546874999969,
+      "wrong_selections": 862
+    },
+    {
+      "scenario": "concentrated",
+      "budget": 25600,
+      "policy": "event_following",
+      "worlds": 1024,
+      "mean_regret": 0.02677734375000011,
+      "wrong_selections": 457
+    },
+    {
+      "scenario": "concentrated",
+      "budget": 25600,
+      "policy": "neyman",
+      "worlds": 1024,
+      "mean_regret": 0.01932617187500007,
+      "wrong_selections": 539
+    },
+    {
+      "scenario": "concentrated",
+      "budget": 25600,
+      "policy": "uniform",
+      "worlds": 1024,
+      "mean_regret": 0.026767578125000108,
+      "wrong_selections": 456
+    },
+    {
+      "scenario": "concentrated",
+      "budget": 25600,
+      "policy": "uniform_all",
+      "worlds": 1024,
+      "mean_regret": 0.026757812500000106,
+      "wrong_selections": 455
+    },
+    {
+      "scenario": "diffuse",
+      "budget": 6400,
+      "policy": "event_following",
+      "worlds": 1024,
+      "mean_regret": 0.03113281249999961,
+      "wrong_selections": 804
+    },
+    {
+      "scenario": "diffuse",
+      "budget": 6400,
+      "policy": "neyman",
+      "worlds": 1024,
+      "mean_regret": 0.030671874999999623,
+      "wrong_selections": 791
+    },
+    {
+      "scenario": "diffuse",
+      "budget": 6400,
+      "policy": "uniform",
+      "worlds": 1024,
+      "mean_regret": 0.031171874999999613,
+      "wrong_selections": 805
+    },
+    {
+      "scenario": "diffuse",
+      "budget": 6400,
+      "policy": "uniform_all",
+      "worlds": 1024,
+      "mean_regret": 0.03091406249999962,
+      "wrong_selections": 799
+    },
+    {
+      "scenario": "diffuse",
+      "budget": 25600,
+      "policy": "event_following",
+      "worlds": 1024,
+      "mean_regret": 0.02081640624999988,
+      "wrong_selections": 542
+    },
+    {
+      "scenario": "diffuse",
+      "budget": 25600,
+      "policy": "neyman",
+      "worlds": 1024,
+      "mean_regret": 0.02288671874999988,
+      "wrong_selections": 602
+    },
+    {
+      "scenario": "diffuse",
+      "budget": 25600,
+      "policy": "uniform",
+      "worlds": 1024,
+      "mean_regret": 0.02081640624999988,
+      "wrong_selections": 542
+    },
+    {
+      "scenario": "diffuse",
+      "budget": 25600,
+      "policy": "uniform_all",
+      "worlds": 1024,
+      "mean_regret": 0.02076953124999988,
+      "wrong_selections": 541
+    },
+    {
+      "scenario": "no_rare_loss",
+      "budget": 6400,
+      "policy": "event_following",
+      "worlds": 1024,
+      "mean_regret": 0.0,
+      "wrong_selections": 0
+    },
+    {
+      "scenario": "no_rare_loss",
+      "budget": 6400,
+      "policy": "neyman",
+      "worlds": 1024,
+      "mean_regret": 0.0,
+      "wrong_selections": 0
+    },
+    {
+      "scenario": "no_rare_loss",
+      "budget": 6400,
+      "policy": "uniform",
+      "worlds": 1024,
+      "mean_regret": 0.0,
+      "wrong_selections": 0
+    },
+    {
+      "scenario": "no_rare_loss",
+      "budget": 6400,
+      "policy": "uniform_all",
+      "worlds": 1024,
+      "mean_regret": 0.0,
+      "wrong_selections": 0
+    },
+    {
+      "scenario": "no_rare_loss",
+      "budget": 25600,
+      "policy": "event_following",
+      "worlds": 1024,
+      "mean_regret": 0.0,
+      "wrong_selections": 0
+    },
+    {
+      "scenario": "no_rare_loss",
+      "budget": 25600,
+      "policy": "neyman",
+      "worlds": 1024,
+      "mean_regret": 0.0,
+      "wrong_selections": 0
+    },
+    {
+      "scenario": "no_rare_loss",
+      "budget": 25600,
+      "policy": "uniform",
+      "worlds": 1024,
+      "mean_regret": 0.0,
+      "wrong_selections": 0
+    },
+    {
+      "scenario": "no_rare_loss",
+      "budget": 25600,
+      "policy": "uniform_all",
+      "worlds": 1024,
+      "mean_regret": 0.0,
+      "wrong_selections": 0
+    }
+  ]
+}

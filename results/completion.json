@@ -1,0 +1,21 @@
+{
+  "complete": true,
+  "draws": 393216000,
+  "finished_utc": "2026-10-05T05:59:23.540865+00:00",
+  "manifest_sha256": "63b1dc803bb38eb353c1ccf30e2c40f34f823ce3c31a280c31b8b510fa0eb8ca",
+  "report_sha256": "00019f26e844ab798f02bf08d637ef56f002c35044157b079288d135568dc844",
+  "results_sha256": "f4ff8094041fb311272c7a469b5902c7ae39655f8b0cca5c08a160d9ca9c71d9",
+  "rows": 24576,
+  "source_hashes": {
+    "PROTOCOL.md": "0787c63f49d33259af773d197ef6b0817b477d75e8622e6f79a5dda89df34e63",
+    "experiment.py": "941d23d329f10ddfed629d6b8935256dea0cb79b04ded6b65bb60fd047ba11da",
+    "independent_audit.py": "ae346518dc9849cc11693565734cd83bbfe37daefc9e1e8e427cf485cd12d952",
+    "record_types.py": "76fa3bb94f1ab84123849b96662a61da24dced46a0b33cf237077673b41536a2",
+    "reporting.py": "492be9ede87efec7ec643e5578a6df9f5b74efec5a27dba78e1eb386535f2f6c",
+    "run_experiment.py": "efd3bce221eba5daa6d38592713c2ff26efad774ad59e8df995f1b4e981789f5",
+    "test_experiment.py": "9ceec6777d02ecc3579d24caf3c3a288a93d0bc6af5286d027c4bcd49148a099",
+    "test_independent_audit.py": "7c628155a7838cc63e37f7678e01dd8fdf601371b490805344f8ff6c392ad9e1",
+    "test_reporting.py": "cf64cbdbb9ebe4faf8df1cceb10f716b758ed90a983c8443d3120e1c94068bf9"
+  },
+  "summary_sha256": "418dacc453631972f9dabaf9d58fcb32501252d19df049fe44b2626d8888ff95"
+}
