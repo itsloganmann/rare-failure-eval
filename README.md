@@ -20,10 +20,18 @@ Same budget. Same tasks. Same 1,024 simulated worlds.
 | Diffuse risk: wrong picks | 541 / 1,024 | 602 / 1,024 |
 | Diffuse risk: mean utility lost | 0.0208 | 0.0229 |
 
-**Report both frequency and cost of mistakes.** Under concentrated risk, the
-variance-based policy made more wrong picks but lost less utility on average.
-Under diffuse risk, it did worse on both metrics. This is a tradeoff inside a
-synthetic generator, not a general win for adaptive evaluation.
+**Selection accuracy and decision cost can rank evaluators differently.** In the
+concentrated setting, variance allocation increased the wrong-selection rate
+from 44.4% to 52.6%, while reducing mean utility lost by 27.8% (0.0268 to 0.0193).
+It picked the true best agent less often, but its mistakes were less costly on
+average. Under diffuse risk, both metrics were worse.
+
+For an evaluation pipeline, the practical lesson is to measure both how often
+it selects a suboptimal agent and how much expected utility that choice loses.
+Accuracy counts a near tie and a costly mistake equally. Regret captures the
+utility gap, but does not enforce a catastrophic-risk limit. These synthetic
+results motivate reporting both; they do not establish deployment safety or a
+general advantage for adaptive evaluation.
 
 ## Try it
 

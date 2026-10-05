@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 COLORS = {
-    "uniform_all": "#727A83",
+    "uniform_all": "#929DA6",
     "uniform": "#8B9BAC",
-    "neyman": "#316B98",
+    "neyman": "#12675F",
     "event_following": "#BF9270",
 }
 LABELS = {
@@ -55,17 +55,25 @@ def build(summary_path: Path, out: Path) -> None:
         ("concentrated", "Concentrated rare loss"),
         ("diffuse", "Diffuse rare loss"),
     ]
-    fig = plt.figure(figsize=(10.8, 11.6))
-    fig.text(0.08, 0.953, "Rare failures and agent selection", size=27, weight="medium")
+    fig = plt.figure(figsize=(10, 11.25))
     fig.text(
-        0.08,
-        0.913,
+        0.065,
+        0.947,
+        "Selection accuracy can miss\nthe cost of a wrong choice",
+        size=27,
+        weight="semibold",
+        va="top",
+        linespacing=1.12,
+    )
+    fig.text(
+        0.065,
+        0.835,
         f"{n:,} simulated worlds · {budget:,} draws per policy per world",
-        size=16,
+        size=13,
         color="#576675",
     )
     for j, metric in enumerate(["best_agent_error", "simple_regret"]):
-        ax = fig.add_axes((0.28, 0.53 if j == 0 else 0.19, 0.61, 0.23))
+        ax = fig.add_axes((0.26, 0.485 if j == 0 else 0.17, 0.66, 0.20))
         values = [
             lookup[scenario, budget, p][metric] * (n if j == 0 else 1)
             for scenario, _ in scenarios
@@ -80,27 +88,30 @@ def build(summary_path: Path, out: Path) -> None:
                     y,
                     value,
                     color=COLORS[policy],
-                    height=0.39,
+                    height=0.27,
                     label=LABELS[policy] if i == 0 else None,
                 )
                 ax.text(
                     value + limit * 0.025,
                     y,
                     f"{round(value):,}" if j == 0 else f"{value:.4f}",
-                    size=20,
+                    size=16,
                     va="center",
+                    weight="medium",
                 )
         ax.set_xlim(0, limit)
         ax.set_ylim(-0.15, 3.5)
-        ax.set_yticks([2.625, 0.625], ["Concentrated\nrisk", "Diffuse\nrisk"], size=18)
-        ax.tick_params(axis="x", labelsize=16)
+        ax.set_yticks([2.625, 0.625], ["Concentrated\nrisk", "Diffuse\nrisk"], size=14)
+        ax.tick_params(axis="x", labelsize=12)
         ax.locator_params(axis="x", nbins=4)
         ax.set_title(
-            f"Selection errors / {n:,}" if j == 0 else "Mean regret (utility lost)",
+            f"Wrong selections out of {n:,}"
+            if j == 0
+            else "Mean utility lost per selection",
             loc="left",
-            pad=20,
-            size=22,
-            weight="medium",
+            pad=19,
+            size=17,
+            weight="semibold",
         )
         style_axis(ax)
         if j == 0:
@@ -109,22 +120,22 @@ def build(summary_path: Path, out: Path) -> None:
                 handles,
                 labels,
                 loc="upper left",
-                bbox_to_anchor=(0.07, 0.885),
+                bbox_to_anchor=(0.056, 0.806),
                 frameon=False,
                 ncol=2,
-                fontsize=16,
+                fontsize=13,
                 handlelength=1.2,
             )
     fig.text(
-        0.08,
-        0.07,
-        "Lower values are better. Independent synthetic experiment.\n"
-        "Full results, paired intervals and reproduction instructions in the repository.",
-        size=14,
+        0.065,
+        0.048,
+        "Lower is better. Utility lost = best agent's expected utility minus the selected agent's.\n"
+        "Synthetic results, not a real-agent benchmark. Full data and uncertainty in the repo.",
+        size=10.5,
         color="#576675",
         linespacing=1.5,
     )
-    fig.savefig(out / "headline.png", dpi=100)
+    fig.savefig(out / "headline.png", dpi=160)
     fig.savefig(out / "headline.svg")
     plt.close(fig)
 
