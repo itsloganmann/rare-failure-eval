@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 COLORS = {
-    "uniform_all": "#34475E",
+    "uniform_all": "#727A83",
     "uniform": "#8B9BAC",
-    "neyman": "#008A81",
+    "neyman": "#316B98",
     "event_following": "#BF9270",
 }
 LABELS = {
@@ -46,72 +46,86 @@ def build(summary_path: Path, out: Path) -> None:
             "text.color": "#243342",
             "xtick.color": "#576675",
             "ytick.color": "#243342",
-            "figure.facecolor": "#FAFAF7",
-            "axes.facecolor": "#FAFAF7",
+            "figure.facecolor": "white",
+            "axes.facecolor": "white",
         }
-    )
-    fig, axs = plt.subplots(2, 2, figsize=(13, 9.2))
-    fig.subplots_adjust(
-        left=0.24, right=0.94, top=0.68, bottom=0.19, hspace=0.9, wspace=0.32
-    )
-    fig.text(0.055, 0.955, "RARE FAILURE EVAL", size=12, weight="bold", color="#008A81")
-    fig.text(
-        0.055,
-        0.90,
-        "Picking the wrong agent is\nonly half the story.",
-        size=29,
-        weight="bold",
-        linespacing=1.15,
-        va="top",
-    )
-    fig.text(
-        0.055,
-        0.755,
-        f"{n:,} fresh simulated worlds  /  {budget:,} draws per policy per world",
-        size=13,
-        color="#576675",
     )
     policies = ["uniform_all", "neyman"]
     scenarios = [
         ("concentrated", "Concentrated rare loss"),
         ("diffuse", "Diffuse rare loss"),
     ]
-    for i, (scenario, label) in enumerate(scenarios):
-        for j, metric in enumerate(["best_agent_error", "simple_regret"]):
-            ax = axs[i, j]
-            raw = [lookup[scenario, budget, p][metric] for p in policies]
-            values = [v * n for v in raw] if j == 0 else raw
-            ax.barh([1, 0], values, color=[COLORS[p] for p in policies], height=0.48)
-            ax.set_yticks([1, 0], [LABELS[p] for p in policies] if j == 0 else ["", ""])
-            ax.set_xlim(0, max(values) * 1.3 if max(values) else 1)
-            for y, value in zip([1, 0], values, strict=True):
-                text = f"{round(value):,} / {n:,}" if j == 0 else f"{value:.4f}"
-                ax.text(
-                    value + ax.get_xlim()[1] * 0.025,
-                    y,
-                    text,
-                    va="center",
-                    size=12,
-                    weight="bold",
-                )
-            ax.set_xlabel(
-                "Wrong-agent selections" if j == 0 else "Mean regret (utility lost)",
-                size=11,
-            )
-            if j == 0:
-                ax.set_title(label, loc="left", pad=18, weight="bold", size=14)
-            style_axis(ax)
+    fig = plt.figure(figsize=(10.8, 11.6))
+    fig.text(0.08, 0.953, "Rare failures and agent selection", size=27, weight="medium")
     fig.text(
-        0.055,
-        0.05,
-        "Lower is better in both columns. Point estimates from a fixed synthetic generator.\n"
-        "All 4 policies, both budgets, paired intervals and limitations are in the report.",
-        size=11,
+        0.08,
+        0.913,
+        f"{n:,} simulated worlds · {budget:,} draws per policy per world",
+        size=16,
+        color="#576675",
+    )
+    for j, metric in enumerate(["best_agent_error", "simple_regret"]):
+        ax = fig.add_axes((0.28, 0.53 if j == 0 else 0.19, 0.61, 0.23))
+        values = [
+            lookup[scenario, budget, p][metric] * (n if j == 0 else 1)
+            for scenario, _ in scenarios
+            for p in policies
+        ]
+        limit = max(max(values) * 1.24, 1 if j == 0 else 0.001)
+        for i, (scenario, _) in enumerate(scenarios):
+            for k, policy in enumerate(policies):
+                y = 2.9 - i * 2 - k * 0.55
+                value = lookup[scenario, budget, policy][metric] * (n if j == 0 else 1)
+                ax.barh(
+                    y,
+                    value,
+                    color=COLORS[policy],
+                    height=0.39,
+                    label=LABELS[policy] if i == 0 else None,
+                )
+                ax.text(
+                    value + limit * 0.025,
+                    y,
+                    f"{round(value):,}" if j == 0 else f"{value:.4f}",
+                    size=20,
+                    va="center",
+                )
+        ax.set_xlim(0, limit)
+        ax.set_ylim(-0.15, 3.5)
+        ax.set_yticks([2.625, 0.625], ["Concentrated\nrisk", "Diffuse\nrisk"], size=18)
+        ax.tick_params(axis="x", labelsize=16)
+        ax.locator_params(axis="x", nbins=4)
+        ax.set_title(
+            f"Selection errors / {n:,}" if j == 0 else "Mean regret (utility lost)",
+            loc="left",
+            pad=20,
+            size=22,
+            weight="medium",
+        )
+        style_axis(ax)
+        if j == 0:
+            handles, labels = ax.get_legend_handles_labels()
+            fig.legend(
+                handles,
+                labels,
+                loc="upper left",
+                bbox_to_anchor=(0.07, 0.885),
+                frameon=False,
+                ncol=2,
+                fontsize=16,
+                handlelength=1.2,
+            )
+    fig.text(
+        0.08,
+        0.07,
+        "Lower values are better. Independent synthetic experiment.\n"
+        "Full results, paired intervals and reproduction instructions in the repository.",
+        size=14,
         color="#576675",
         linespacing=1.5,
     )
-    fig.savefig(out / "headline.png", dpi=180, bbox_inches="tight")
-    fig.savefig(out / "headline.svg", bbox_inches="tight")
+    fig.savefig(out / "headline.png", dpi=100)
+    fig.savefig(out / "headline.svg")
     plt.close(fig)
 
     fig, axs = plt.subplots(3, 2, figsize=(13, 11), layout="constrained")

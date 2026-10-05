@@ -1,97 +1,103 @@
 # Rare Failure Eval
 
-A reproducible stress test for a practical agent-evaluation question:
-**how often you choose the wrong agent and how costly that choice is can disagree.**
+**An agent evaluator can make more wrong picks and still lose less utility.**
 
-This project allocates a fixed evaluation budget across four synthetic agents and
-eight tasks. Rare failures reduce utility, rather than being counted separately
-from the score. Every agent is evaluated against the same fixed task distribution.
+A reproducible Python experiment on rare failures, fixed evaluation budgets,
+and the gap between selection accuracy and the cost of a mistake.
 
-![Selection error and regret](figures/headline.png)
+[Results](FINDINGS.md) · [Full comparison](results/REPORT.md) · [Protocol](PROTOCOL.md) · [Raw data](results/results.jsonl.gz)
 
-## Fresh-run finding
+<img src="figures/headline.png" alt="Uniform versus variance allocation. Concentrated risk: 455 versus 539 wrong picks, regret 0.0268 versus 0.0193. Diffuse risk: 541 versus 602 wrong picks, regret 0.0208 versus 0.0229. Each condition has 1,024 worlds and 25,600 draws per policy per world." width="540">
 
-At 25,600 simulated draws, variance allocation chose the wrong agent more often
-under concentrated risk: **539 versus 455 of 1,024 worlds**. Yet its mean regret
-was lower: **0.0193 versus 0.0268**. Its mistakes were less costly on average.
-Under diffuse risk it had more wrong selections and higher regret. This is a
-metric tradeoff in this generator, not a general advantage for adaptation.
+## Results
 
-[Read the finding, uncertainty and full scope](FINDINGS.md).
+Same budget. Same tasks. Same 1,024 simulated worlds.
 
-## What is being tested?
+| At 25,600 draws per policy per world | Uniform, full budget | Variance allocation |
+| :--- | ---: | ---: |
+| Concentrated risk: wrong picks | 455 / 1,024 | 539 / 1,024 |
+| Concentrated risk: mean utility lost | 0.0268 | 0.0193 |
+| Diffuse risk: wrong picks | 541 / 1,024 | 602 / 1,024 |
+| Diffuse risk: mean utility lost | 0.0208 | 0.0229 |
 
-- **Uniform, full budget:** balanced sampling with every draw used for estimation.
-- **Uniform, pilot matched:** the same two-stage cost as the adaptive policies.
-- **Variance allocation:** a four-draw-per-cell pilot sets a frozen, regularized
-  Neyman allocation. A uniform floor keeps every task represented.
-- **Follow pilot failures:** spend more where the pilot observed a failure;
-  otherwise fall back to uniform allocation within each agent.
+**Report both frequency and cost of mistakes.** Under concentrated risk, the
+variance-based policy made more wrong picks but lost less utility on average.
+Under diffuse risk, it did worse on both metrics. This is a tradeoff inside a
+synthetic generator, not a general win for adaptive evaluation.
 
-The target is expected utility, `reward - 800 * failure`, under known task weights.
-A wrong selection is a binary error. Simple regret measures how much expected
-utility was lost by that selection. Neither metric replaces a safety constraint.
+## Try it
 
-The fresh-seed run has 1,024 randomized worlds, three risk settings and two budgets
-(6,400 and 25,600 simulated draws per policy per world). Its complete grid has
-24,576 records and 393,216,000 simulated draws. These are arithmetic simulations,
-not calls to language models or measurements of deployed agents.
-
-## Reproduce
-
-Tested with Python 3.13. CPU only; no credentials or API.
+Python 3.13. CPU only. No model API, credentials or private data.
 
 ```sh
+git clone https://github.com/itsloganmann/rare-failure-eval.git
+cd rare-failure-eval
 python3.13 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python -m pytest -q
 .venv/bin/python run_experiment.py --mode smoke --out outputs/smoke
+```
+
+Read `outputs/smoke/REPORT.md` to inspect the smoke run. Use a new output directory
+for each run. The published findings come from the full run, not smoke mode.
+
+<details>
+<summary>Tests, full replication and independent verification</summary>
+
+```sh
+.venv/bin/python -m pytest -q
 .venv/bin/python run_experiment.py --mode primary --approved-primary --out outputs/replication
 .venv/bin/python run_experiment.py --verify --out outputs/replication
 .venv/bin/python independent_audit.py outputs/replication
-.venv/bin/python make_figures.py outputs/replication/summary.json --out figures
+.venv/bin/python make_figures.py outputs/replication/summary.json --out outputs/figures
 ```
 
-Output directories must be new. The explicit primary flag is an execution gate,
-not proof of peer review. The runner writes a manifest before sampling, hashes the
-source and artifacts, enforces the complete fixed grid and rejects partial runs.
-The independent audit reconstructs weighted estimates, rankings, tie handling,
-selection error and regret from saved sufficient statistics without importing the
-simulation or reporting implementation.
+The primary flag is an execution gate, not evidence of peer review. To verify the
+distributed run without resampling:
 
-## Read the results
+```sh
+mkdir -p outputs/published
+cp results/*.json results/REPORT.md outputs/published/
+gzip -dc results/results.jsonl.gz > outputs/published/results.jsonl
+.venv/bin/python run_experiment.py --verify --out outputs/published
+.venv/bin/python independent_audit.py outputs/published
+```
 
-- [Complete comparison](results/REPORT.md): every policy, scenario and budget.
-- [Full summary](results/summary.json): 288 condition/metric means and all 432
-  paired contrasts, including undefined values explicitly represented as null.
-- [Protocol](PROTOCOL.md): generator, costs, estimator, intervals and assumptions.
-- [Reconstruction audit](results/audit.json): complete grid and primary metrics.
-- [All conditions](figures/all_conditions.png): full visual comparison.
+The manifest hashes the frozen study code and outputs. The separate arithmetic
+audit reconstructs weighted estimates, rankings, ties, selection error and regret
+from saved sufficient statistics.
 
-Compressed raw records and the collection manifest are in `results/`. To verify
-the distributed run, copy that directory to a new location, decompress
-`results.jsonl.gz` there to `results.jsonl`, then run the verifier on that directory.
-Keep the other manifest and completion files alongside it. Exact source and
-package versions matter for deterministic replay.
+</details>
 
-## Interpretation limits
+## What is inside
 
-This is an exploratory fresh-seed replication of an earlier 128-world pilot.
-The plan was written before inspecting the new seeds; it was not publicly
-preregistered. More seeds check Monte Carlo stability inside the same generator,
-not transfer to real agents. The risk settings do not match total event mass, so
-concentrated versus diffuse risk is not a controlled causal comparison.
+Four synthetic agents, eight tasks, three risk settings, two budgets and four
+sampling policies. Utility is `reward - 800 * failure`, using fixed task weights.
+Regret is the true best agent's expected utility minus the selected agent's.
 
-Four pilot draws have only a 0.4% chance of observing a failure with probability
-0.001 in a cell. Zero observed failures do not establish safety. Point estimates
-use fresh second-stage samples and fixed task weights; selecting their maximum
-can still introduce optimism. Paired bootstrap intervals are descriptive and
-unadjusted. Binomial risk intervals are one-look bounds, not anytime guarantees.
-The variance-directed allocation is not a best-arm optimal algorithm.
+| Policy | Allocation |
+| :--- | :--- |
+| Uniform, full budget | Every draw goes into balanced estimation |
+| Uniform, pilot matched | A pilot followed by balanced independent estimation |
+| Variance allocation | A four-draw-per-cell pilot sets a frozen Neyman allocation, with a uniform floor |
+| Follow pilot failures | Allocate toward observed failures; otherwise use uniform sampling |
 
-## Inspiration
+The full run contains 24,576 records and 393,216,000 simulated draws.
+[All conditions](figures/all_conditions.png) · [Paired intervals](FINDINGS.md#uncertainty) · [Audit](results/audit.json)
 
-[Active Evaluation of General Agents](https://arxiv.org/abs/2601.07651v2),
-Lanctot et al. (2026), frames evaluation as a sampling-allocation problem. This is
-an independent synthetic extension, not a replication of its Elo or Soft
-Condorcet algorithms. No employer data or institutional endorsement is involved.
+## Scope
+
+- **Synthetic, exploratory replication.** Fresh seeds after a 128-world pilot;
+  not publicly preregistered and not a real-agent benchmark.
+- **No universal improvement claim.** Results depend on setting and budget.
+  Risk settings do not match total event mass, so their difference is not causal.
+- **Rare failures are easy to miss.** Four draws detect a 0.001-probability event
+  only 0.4% of the time. No observed failures does not establish safety.
+- **Expected regret is not a safety constraint.** Paired bootstrap intervals are
+  descriptive and unadjusted. One-look risk bounds are not anytime guarantees.
+
+## Background
+
+Inspired by [Active Evaluation of General Agents](https://arxiv.org/abs/2601.07651v2),
+Lanctot et al. (2026). This independent experiment studies rare-loss utility and
+sampling allocation; it does not reproduce that paper's Elo or Soft Condorcet
+algorithms. No employer data or institutional endorsement is involved.
